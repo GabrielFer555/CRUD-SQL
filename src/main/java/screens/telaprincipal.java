@@ -26,7 +26,7 @@ import screens.identities.Sector;
  *
  * @author Pichau
  */
-public final class telaprincipal extends javax.swing.JFrame {
+public class telaprincipal extends javax.swing.JFrame {
 
     /**
      * Creates new form telaprincipal
@@ -102,11 +102,12 @@ public final class telaprincipal extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
-        tabela_sector.setColumnSelectionAllowed(true);
+        tabela_sector.setColumnSelectionAllowed(false);
         tabela_sector.setGridColor(new java.awt.Color(153, 153, 153));
-        tabela_sector.setRowSelectionAllowed(false);
-        tabela_sector.setSelectionBackground(new java.awt.Color(153, 153, 153));
+        tabela_sector.setRowSelectionAllowed(true);
+        tabela_sector.setSelectionBackground(new java.awt.Color(0, 204, 204));
         tabela_sector.setSelectionForeground(new java.awt.Color(0, 0, 0));
+        tabela_sector.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         tabela_sector.getTableHeader().setReorderingAllowed(false);
         tabela_sector.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -132,6 +133,11 @@ public final class telaprincipal extends javax.swing.JFrame {
         edit_btn.setBackground(new java.awt.Color(255, 255, 255));
         edit_btn.setForeground(new java.awt.Color(0, 0, 0));
         edit_btn.setText("Editar");
+        edit_btn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                edit_btnActionPerformed(evt);
+            }
+        });
 
         exclude_btn.setBackground(new java.awt.Color(255, 255, 255));
         exclude_btn.setForeground(new java.awt.Color(0, 0, 0));
@@ -273,7 +279,32 @@ public final class telaprincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exclude_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exclude_btnActionPerformed
-        // TODO add your handling code here:
+        String x = sector_field.getText();
+        int yesorno = JOptionPane.showConfirmDialog(this, "Deseja excluir o setor " + x +"?", "Opa perai amigo", JOptionPane.YES_NO_CANCEL_OPTION);
+        if(yesorno == 0){
+            try {
+            String numsector = num_setorfield.getText();
+            String descSector = sector_field.getText();
+            JOptionPane.showMessageDialog(this, Sector.removeFromSQL(numsector, descSector));
+            tabletop();
+            num_setorfield.setText(null);
+            sector_field.setText(null);
+        } catch (SQLException b) {
+            JOptionPane.showMessageDialog(this, "ERRO: VERIFIQUE!");
+        } catch (ClassNotFoundException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
+        }
+        }else if(yesorno == 1){
+            JOptionPane.showMessageDialog(this, "Entendido, Cancelando a Operação...", "Cancelando Operação", HEIGHT);
+            telamode("default");
+            sector_field.setText(null);
+            num_setorfield.setText(null);
+        }else{
+            telamode("default");
+            sector_field.setText(null);
+            num_setorfield.setText(null);
+        }
+        
     }//GEN-LAST:event_exclude_btnActionPerformed
 
     private void new_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_new_btnActionPerformed
@@ -293,30 +324,59 @@ public final class telaprincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_new_btnActionPerformed
 
     private void cancel_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancel_btnActionPerformed
-        
+
         int valorsetor = Integer.valueOf(num_setorfield.getText()) - 1;
         sector_field.setText(null);
         num_setorfield.setText(String.valueOf(valorsetor));
         telamode("default");
-        
+
 
     }//GEN-LAST:event_cancel_btnActionPerformed
 
     private void confirm_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirm_btnActionPerformed
-
-        DefaultTableModel tabela = (DefaultTableModel) tabela_sector.getModel();
-        String numsector = num_setorfield.getText();
-        String descSector = sector_field.getText();
-        Sector x = new Sector();
-        JOptionPane.showMessageDialog(this, x.addToSQL(numsector, descSector));
-        telamode("default");
-        try {
-            tabletop();
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(telaprincipal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(telaprincipal.class.getName()).log(Level.SEVERE, null, ex);
+            String numsector = num_setorfield.getText();
+            String descSector = sector_field.getText();
+        if (this.screenmode == "new") {
+            DefaultTableModel tabela = (DefaultTableModel) tabela_sector.getModel();
+            Sector x = new Sector();
+            try {
+                x.addToSQL(numsector, descSector);
+                JOptionPane.showMessageDialog(this,"Sucesso" );
+                tabletop();
+            } catch (ClassNotFoundException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+            } finally {
+                telamode("default");
+            }
         }
+            if (this.screenmode == "editing") {
+                int output = JOptionPane.showConfirmDialog(this, "Confirma alterações? ", "Confirmação", JOptionPane.YES_NO_OPTION);
+                if(output == 0){
+                    try {
+                    Sector.editFromSQL(descSector, numsector);
+                    JOptionPane.showMessageDialog(this, "Sucesso!");
+                    tabletop();
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                } catch (ClassNotFoundException ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                } catch (IllegalArgumentException ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage());
+                } finally {
+                    telamode("default");
+                    num_setorfield.setText(null);
+                    sector_field.setText(null);
+                }
+                }else{
+                    telamode("default");
+                    num_setorfield.setText(null);
+                    sector_field.setText(null);
+                }
+                
+            }
+        
     }//GEN-LAST:event_confirm_btnActionPerformed
 
     private void tabela_sectorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabela_sectorMouseClicked
@@ -324,11 +384,14 @@ public final class telaprincipal extends javax.swing.JFrame {
         int model = tabela_sector.getSelectedRow();
         sector_field.setText(modela.getValueAt(model, 1).toString());
         num_setorfield.setText(modela.getValueAt(model, 0).toString());;
-        
-        
+        telamode("selected");
 
 
     }//GEN-LAST:event_tabela_sectorMouseClicked
+
+    private void edit_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_edit_btnActionPerformed
+        telamode("editing");
+    }//GEN-LAST:event_edit_btnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -383,7 +446,7 @@ public final class telaprincipal extends javax.swing.JFrame {
     private javax.swing.JTabbedPane trocadetela;
     // End of variables declaration//GEN-END:variables
 
-    private final void telamode(String mode) {
+    private void telamode(String mode) {
         this.screenmode = mode;
         if (this.screenmode == "default") {
             new_btn.setEnabled(true);
@@ -404,17 +467,29 @@ public final class telaprincipal extends javax.swing.JFrame {
             num_setorfield.setEnabled(false);
             sector_field.setEnabled(true);
             trocadetela.setEnabled(false);
+
         }
-        if(this.screenmode == "selected"){
+        if (this.screenmode == "selected") {
             new_btn.setEnabled(true);
-            edit_btn.setEnabled(false);
+            edit_btn.setEnabled(true);
             confirm_btn.setEnabled(false);
             exclude_btn.setEnabled(true);
             num_setorfield.setEditable(false);
             cancel_btn.setEnabled(true);
             sector_field.setEnabled(false);
             trocadetela.setEnabled(true);
-            
+
+        }
+        if (this.screenmode == "editing") {
+            new_btn.setEnabled(false);
+            edit_btn.setEnabled(false);
+            confirm_btn.setEnabled(true);
+            exclude_btn.setEnabled(true);
+            num_setorfield.setEditable(false);
+            cancel_btn.setEnabled(true);
+            sector_field.setEnabled(true);
+            trocadetela.setEnabled(false);
+
         }
 
     }
@@ -435,7 +510,7 @@ public final class telaprincipal extends javax.swing.JFrame {
 
     }
 
-    private final Integer lastnum() throws ClassNotFoundException, SQLException {
+    private Integer lastnum() throws ClassNotFoundException, SQLException {
         Class.forName("com.mysql.jdbc.Driver");
         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/java_db", "root", "password");
         DefaultTableModel model = (DefaultTableModel) tabela_sector.getModel();
