@@ -19,7 +19,7 @@ import screens.telaprincipal;
  *
  * @author Pichau
  */
-public class Sector {
+public class Sector{
 
     private String num_sector;
     private String desc_Sector;
@@ -47,9 +47,9 @@ public class Sector {
     public void setDesc_Sector(String desc_Sector) {
         this.desc_Sector = desc_Sector;
     }
-
+    
     public void addToSQL(String numsector, String descSector) throws ClassNotFoundException, SQLException, IllegalArgumentException {
-        if(numsector == "" || numsector == null){
+        if(numsector == "" || descSector == null){
             throw new IllegalArgumentException("Setor com nome vazio! \n VERIFIQUE!");
         }
         
@@ -64,20 +64,21 @@ public class Sector {
 
     }
     
-    public static String removeFromSQL(String num_sector, String descSector) throws ClassNotFoundException, SQLException {
+    public static String removeFromSQL(String x, String y) throws ClassNotFoundException, SQLException {
+        
         Class.forName("com.mysql.jdbc.Driver");
         Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/java_db", "root", "password");
         Statement st = con.createStatement();
         String sql = "DELETE FROM setores WHERE setor_num = ? AND setor_description = ?";
         PreparedStatement prepared = con.prepareStatement(sql);
-        prepared.setString(1, num_sector);
-        prepared.setString(2, descSector);
+        prepared.setString(1, x);
+        prepared.setString(2, y);
         prepared.execute();
         con.close();
         return ("Sucesso!");
 
     }
-
+   
     public static void editFromSQL(String setor_desc, String sector_num) throws SQLException, ClassNotFoundException, IllegalArgumentException {
 
         Class.forName("com.mysql.jdbc.Driver");

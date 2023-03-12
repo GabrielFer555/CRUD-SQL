@@ -4,21 +4,33 @@
  */
 package screens;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 import javax.swing.JOptionPane;
 import static javax.swing.UIManager.get;
-import screens.telaprincipal;
+import screens.telaprincipal;;
+
 /**
  *
  * @author Pichau
  */
 public class logintela extends javax.swing.JFrame {
 
+  
+
     /**
      * Creates new form logintela
      */
     public logintela() {
+
         initComponents();
+
     }
 
     /**
@@ -166,32 +178,33 @@ public class logintela extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+
     private void logar_btnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logar_btnActionPerformed
         String user = user_field.getText();
         char[] senha = senha_field.getPassword();
         String senhajoined = new String(senha);
-        
-        try{
+
+        try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/java_db","root","password");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/java_db", "root", "password");
             Statement stm = con.createStatement();
-            String sql = "SELECT * FROM users WHERE senha = '"+senhajoined+"' AND username = '"+user+"'";
-            try{
+            String sql = "SELECT * FROM users WHERE senha = '" + senhajoined + "' AND username = '" + user + "'";
+            try {
                 ResultSet x = stm.executeQuery(sql);
-                if(x.next()){
+                if (x.next()) {
                     JOptionPane.showMessageDialog(this, "Logado!");
                     this.setVisible(false);
                     new telaprincipal().setVisible(true);
-                    
-                }else{
+
+                } else {
                     JOptionPane.showMessageDialog(this, "Usuário ou Senha Incorretos");
-                    
+
                 }
-                
-            }catch(SQLException e){
+
+            } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Senha ou usuários incorretos");
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
     }//GEN-LAST:event_logar_btnActionPerformed
